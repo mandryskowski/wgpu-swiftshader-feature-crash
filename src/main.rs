@@ -24,39 +24,25 @@ async fn run() {
 
     println!("Found Adapter: {:?}", adapter.get_info());
 
-    let features = adapter.features();
-    if !features.contains(Features::SUBGROUP) {
-        println!("Adapter does not report SUBGROUP support. Cannot trigger the bug.");
-        return;
-    }
-
     let (device, _queue) = adapter
         .request_device(
             &DeviceDescriptor {
                 required_limits: Limits {
-                    // This is needed to support swiftshader
                     max_storage_textures_per_shader_stage: 4,
                     ..Default::default()
                 },
-                required_features: Features::SUBGROUP,
+                required_features: Features::empty(),
                 ..Default::default()
             }
         )
         .await
         .expect("Failed to create device");
 
-    println!("Device created successfully with SUBGROUP feature.");
+    println!("Device created successfully.");
 
     let shader_source = r#"
-        enable subgroups;
-
-        @group(0) @binding(0) var<storage, read_write> data: array<u32>;
-
-        @compute @workgroup_size(64)
-        fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
-            let sum = subgroupAdd(data[global_id.x]);
-            data[global_id.x] = sum;
-        }
+        @compute @workgroup_size(1)
+        fn main() {}
     "#;
 
     println!("Compiling shader module...");
