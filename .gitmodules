@@ -1,0 +1,6 @@
+[submodule "wgpu"]
+	path = wgpu
+	url = https://github.com/gfx-rs/wgpu
+[submodule "swiftshader"]
+	path = swiftshader
+	url = https://github.com/google/swiftshader/
